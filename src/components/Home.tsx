@@ -1,17 +1,19 @@
 import Typewriter from 'typewriter-effect'
 import { getGoogleAuthUrl } from '../api/auth.api';
 import { useState } from 'react';
+import useToast from '../hooks/useToast';
 
 const HomePage = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const showToast = useToast();
 
   const handleGetStartedClick = async (): Promise<void> => {
     setLoading(true);
     try {
-      const url = await getGoogleAuthUrl();
+      const url: string = await getGoogleAuthUrl();
       window.location.href = url
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      showToast(error?.response?.data?.message || 'something went wrong. please try again.', 'error')
     }
     finally {
       setLoading(false)
@@ -20,7 +22,7 @@ const HomePage = () => {
 
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center text-white">
-      <h1 className="text-5xl md:text-6xl font-extrabold mb-12 text-center">
+      <h1 className="text-5xl md:text-6xl font-extrabold mb-12 text-center -mt-10">
         Introducing <span className="text-blue-400">UPTIME</span>
       </h1>
       <h2 className="text-3xl md:text-4xl font-semibold mb-10 text-center">
