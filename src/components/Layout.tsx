@@ -1,12 +1,15 @@
 import { Navbar } from './Navbar';
-// import { Routes, Route, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
   return (
     <div>
+      {/* Persistent Navbar */}
       <Navbar />
-      <main>{children}</main>
-      {/* <Outlet /> */}
+      {/* Dynamic content for each route */}
+      <main>
+        <Outlet />
+      </main>
     </div>
   );
 }
