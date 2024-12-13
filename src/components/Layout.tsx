@@ -4,26 +4,28 @@ import { Outlet } from 'react-router-dom';
 
 export default function Layout() {
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-950 text-white flex flex-col">
       {/* Persistent Navbar */}
       <Navbar />
-      {/* Dynamic content for each route */}
-      <main>
+      
+      {/* Dynamic Content for Each Route */}
+      <main className="flex-1 px-4 py-6">
         <Outlet />
       </main>
+      
+      {/* Toast Notifications */}
       <Toaster
-        position="top-right"
+        position="top-center"
         gutter={8}
         toastOptions={{
           style: {
-            color: "#111827",
-            fontWeight: "600",
-            fontSize: "14px",
-            border: "1px solid #F3F4F6",
-            display: "flex",
-            alignItems: "center",
-            marginTop: '10px',
-            marginRight: '10px'
+            color: '#111827',
+            fontWeight: '600',
+            fontSize: '14px',
+            border: '1px solid #F3F4F6',
+            display: 'flex',
+            alignItems: 'center',
+            marginTop: '20px',
           },
           success: {
             duration: 3000,
