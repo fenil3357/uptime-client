@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import HomePage from './components/Home';
-// import FeaturesPage from './components/Features'; // Placeholder for Features
-// import PricingPage from './components/Pricing'; // Placeholder for Pricing
-// import AboutPage from './components/About'; // Placeholder for About
+import Home from './routes/Home';
+import GoogleAuthCallback from './routes/GoogleAuth';
+import NotFound from './components/NotFound';
+import Dashboard from './routes/Dashboard';
 
 function App() {
   return (
@@ -12,10 +12,10 @@ function App() {
         {/* Define Layout with Navbar */}
         <Route path="/" element={<Layout />}>
           {/* Nested Routes */}
-          <Route index element={<HomePage />} />
-          {/* <Route path="features" element={<FeaturesPage />} />
-          <Route path="pricing" element={<PricingPage />} />
-          <Route path="about" element={<AboutPage />} /> */}
+          <Route index element={<Home />} />
+          <Route path="/auth/google" element={<GoogleAuthCallback />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </Router>
