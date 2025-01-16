@@ -1,17 +1,20 @@
 import Typewriter from 'typewriter-effect'
 import { getGoogleAuthUrl } from '../api/auth.api';
 import { useState } from 'react';
+import useToast from '../hooks/useToast';
+import Button from '../components/Button';
 
-const HomePage = () => {
+const Home = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const showToast = useToast();
 
   const handleGetStartedClick = async (): Promise<void> => {
     setLoading(true);
     try {
-      const url = await getGoogleAuthUrl();
+      const url: string = await getGoogleAuthUrl();
       window.location.href = url
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      showToast(error?.response?.data?.message || 'something went wrong. please try again.', 'error')
     }
     finally {
       setLoading(false)
@@ -19,8 +22,8 @@ const HomePage = () => {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center text-white">
-      <h1 className="text-5xl md:text-6xl font-extrabold mb-12 text-center">
+    <div className="h-screen flex flex-col items-center justify-center text-white">
+      <h1 className="text-5xl md:text-6xl font-extrabold mb-12 text-center -mt-10">
         Introducing <span className="text-blue-400">UPTIME</span>
       </h1>
       <h2 className="text-3xl md:text-4xl font-semibold mb-10 text-center">
@@ -39,11 +42,16 @@ const HomePage = () => {
       <p className="text-lg md:text-xl text-gray-300 mb-10 text-center px-6 md:px-16 lg:px-32">
         The ultimate AI-powered website monitoring system. Track your website’s health with ease, efficiency, and precision.
       </p>
-      <button className={`${loading ? 'cursor-not-allowed' : ''} bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg shadow-lg transition-transform transform hover:scale-105`} onClick={handleGetStartedClick}>
+      {/* <button className={`${loading ? 'cursor-not-allowed' : ''} bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg shadow-lg transition-transform transform hover:scale-105`} onClick={handleGetStartedClick}>
         Get Started
-      </button>
+      </button> */}
+      <Button
+        label="Get Started Now 🚀"
+        isLoading={loading}
+        onClick={handleGetStartedClick}
+      />
     </div>
   );
 };
 
-export default HomePage;
+export default Home;
