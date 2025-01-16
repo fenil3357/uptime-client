@@ -8,7 +8,7 @@ const NotFound = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-950 text-white flex flex-col items-center justify-center -mt-10">
+    <div className="min-h-screen text-white flex flex-col items-center justify-center -mt-10">
       <h1 className="text-7xl font-extrabold mb-6 text-gray-200">
         404
       </h1>
