@@ -1,12 +1,16 @@
-import { redirect } from "react-router-dom";
+import { tokens } from "../types/auth.types";
+import { user } from "../types/user.types";
 import { axiosInstance } from "./axios/axios.instance"
 
-export const getGoogleAuthUrl = async () => {
-  try {
-    const res = await axiosInstance.get('/auth/google');
-    return res.data?.data?.authUrl;
-  } catch (error: any) {
-    console.log("🚀 ~ getGoogleAuthUrl ~ error:", error.message)
-    throw new Error(error?.response?.data?.message || 'Something went wrong while generating google oauth login url')
-  }
+export const getGoogleAuthUrl = async (): Promise<string> => {
+  const res = await axiosInstance.get('/auth/google');
+  return res.data?.data?.authUrl;
+}
+
+export const googleAuthEncryption = async (encrypted: string): Promise<{
+  tokens: tokens,
+  user: user
+}> => {
+  const res = await axiosInstance.get(`/auth/google/encryption?encrypted=${encrypted}`);
+  return res.data?.data;
 }
