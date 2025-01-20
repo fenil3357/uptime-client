@@ -1,29 +1,46 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import useToast from "../hooks/useToast";
 import { getUserMonitors } from "../api/monitor.api";
 import { UserMonitorsType } from "../types/utils.types";
 import Loader from "../components/Loader";
 import LineChartComponent from "../components/Chart";
+import { useUserContext } from "../contexts/user.context";
 
 const Dashboard = () => {
   const showToast = useToast();
   const [monitors, setMonitors] = useState<UserMonitorsType>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
+  const { isLoggedIn, access_token, logout } = useUserContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      showToast('Please login to continue', 'error');
+      navigate('/');
+      return;
+    }
+
     const getAllMonitors = async () => {
       try {
-        const monitors: UserMonitorsType = await getUserMonitors();
+        const monitors: UserMonitorsType = await getUserMonitors(access_token as string);
         setMonitors(monitors);
       } catch (error: any) {
+        // Invalid token error
+        if (error?.response?.status == 401 || error?.response?.status == 403) {
+          logout();
+          showToast('Please login to continue', 'error');
+          navigate('/');
+          return;
+        }
         showToast(error?.response?.data?.message || "Something went wrong. Please try again");
       } finally {
         setLoading(false);
       }
     };
-
     getAllMonitors();
-  }, []);
+  }, [isLoggedIn]);
 
   const handleCreateMonitor = () => {
     console.log("Create New Monitor button clicked");

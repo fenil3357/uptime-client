@@ -1,16 +1,28 @@
 import Typewriter from 'typewriter-effect'
-import { getGoogleAuthUrl } from '../api/auth.api';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { getGoogleAuthUrl } from '../api/auth.api';
 import useToast from '../hooks/useToast';
 import Button from '../components/Button';
+import { useUserContext } from '../contexts/user.context';
 
 const Home = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const showToast = useToast();
+  const navigate = useNavigate();
+  const { isLoggedIn } = useUserContext();
 
   const handleGetStartedClick = async (): Promise<void> => {
     setLoading(true);
     try {
+      // If user is already logged in then redirect to dashboard
+      if (isLoggedIn) {
+        navigate('/dashboard');
+        return;
+      }
+
+      // Or else proceed with authentication
       const url: string = await getGoogleAuthUrl();
       window.location.href = url
     } catch (error: any) {
@@ -46,7 +58,7 @@ const Home = () => {
         Get Started
       </button> */}
       <Button
-        label="Get Started Now 🚀"
+        label={isLoggedIn ? "Go to Dashboard 🖥️" : "Get Started Now 🚀"}
         isLoading={loading}
         onClick={handleGetStartedClick}
       />

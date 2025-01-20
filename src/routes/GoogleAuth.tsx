@@ -4,11 +4,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { googleAuthEncryption } from '../api/auth.api';
 import useToast from '../hooks/useToast';
 import Loader from '../components/Loader';
+import { useUserContext } from '../contexts/user.context';
 
 const GoogleAuthCallback = () => {
   const navigate = useNavigate();
   const showToast = useToast();
-
+  const { login } = useUserContext();
   const [searchParams] = useSearchParams();
   const isAuthHandled = useRef(false);
 
@@ -28,8 +29,7 @@ const GoogleAuthCallback = () => {
 
       try {
         const data = await googleAuthEncryption(encrypted);
-        localStorage.setItem('access_token', data.tokens.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        login(data.user, data.tokens.access_token);
         showToast('Google authentication successful!', 'success');
         navigate('/dashboard');
       } catch (error: any) {
