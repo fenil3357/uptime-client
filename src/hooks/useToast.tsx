@@ -25,6 +25,9 @@ const useToast = () => {
       case "info":
         toast(message as string, { ...defaultOptions, icon: "ℹ️", ...options });
         break;
+      case "warning":
+        toast(message as string, { ...defaultOptions, icon: "⚠️", ...options });
+        break;
       case "custom":
         if (typeof message === "function") {
           toast.custom((t) => message(t), options as ToastOptions);

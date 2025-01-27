@@ -46,6 +46,10 @@ const Dashboard = () => {
     console.log("Create New Monitor button clicked");
   };
 
+  const handleOpenMonitor = (id: string) => {
+    navigate(`/monitor?id=${id}`)
+  }
+
   return (
     <div className="min-h-screen py-8">
       {/* Dashboard Heading */}
@@ -82,14 +86,13 @@ const Dashboard = () => {
               />
 
               {/* Button to redirect to monitor page */}
-              <a
-                href={`/monitor/${monitor.id}`}
-                target="_blank"
+              <button
                 rel="noopener noreferrer"
                 className="mt-auto bg-green-500 text-white py-3 rounded-lg text-center hover:bg-green-600 transition"
+                onClick={() => handleOpenMonitor(monitor.id as string)}
               >
                 OPEN
-              </a>
+              </button>
             </div>
           ))}
         </div>
