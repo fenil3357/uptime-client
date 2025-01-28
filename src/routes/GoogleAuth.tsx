@@ -5,12 +5,14 @@ import { googleAuthEncryption } from '../api/auth.api';
 import useToast from '../hooks/useToast';
 import Loader from '../components/Loader';
 import { useUserContext } from '../contexts/user.context';
+import useApi from '../hooks/useApi';
 
 const GoogleAuthCallback = () => {
   const navigate = useNavigate();
   const showToast = useToast();
   const { login } = useUserContext();
   const [searchParams] = useSearchParams();
+  const axiosInstance = useApi();
   const isAuthHandled = useRef(false);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const GoogleAuthCallback = () => {
       }
 
       try {
-        const data = await googleAuthEncryption(encrypted);
+        const data = await googleAuthEncryption(axiosInstance, encrypted);
         login(data.user, data.tokens.access_token);
         showToast('Google authentication successful!', 'success');
         navigate('/dashboard');

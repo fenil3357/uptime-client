@@ -2,7 +2,7 @@ import { Renderable, toast, ToastOptions } from "react-hot-toast";
 
 import { ShowToastOptions, ToastMessageType, ToastType } from "../types/toast.types";
 
-const useToast = () => {
+const useToast = (): (message: ToastMessageType, type?: ToastType, options?: ShowToastOptions) => void => {
   const showToast = (
     message: ToastMessageType,
     type: ToastType = 'default',
@@ -24,6 +24,9 @@ const useToast = () => {
         break;
       case "info":
         toast(message as string, { ...defaultOptions, icon: "ℹ️", ...options });
+        break;
+      case "warning":
+        toast(message as string, { ...defaultOptions, icon: "⚠️", ...options });
         break;
       case "custom":
         if (typeof message === "function") {
