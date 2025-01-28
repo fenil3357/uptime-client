@@ -4,13 +4,13 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { Menu } from "@headlessui/react";
 
-import { useUserContext } from "../contexts/user.context";
 import useToast from "../hooks/useToast";
 import { getMonitorById, updateMonitorById } from "../api/monitor.api";
 import LineChartComponent from "../components/Chart";
 import { MonitorDataType } from "../types/utils.types";
 import { ReportType } from "../types/report.types";
 import { formatCustomDate } from "../helper/customData";
+import useApi from "../hooks/useApi";
 
 const Monitor = () => {
   const [searchParams] = useSearchParams();
@@ -20,13 +20,13 @@ const Monitor = () => {
   );
   const [monitorData, setMonitorData] = useState<MonitorDataType>();
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [id, setId] = useState<string | null>(searchParams.get("id"));
+  const [id] = useState<string | null>(searchParams.get("id"));
   const [reportData, setReportData] = useState<ReportType[]>([]);
   const [isMonitorActive, setIsMonitorActive] = useState<boolean>(true);
 
-  const { logout, access_token } = useUserContext();
   const navigate = useNavigate();
   const showToast = useToast();
+  const axiosInstance = useApi();
 
   useEffect(() => {
     const getMonitorData = async () => {
@@ -38,7 +38,7 @@ const Monitor = () => {
         }
 
         const data = await getMonitorById(
-          access_token as string,
+          axiosInstance,
           id,
           "0",
           reportStartDate,
@@ -48,12 +48,6 @@ const Monitor = () => {
         setReportData(data?.Report);
         setIsMonitorActive(data?.is_active as boolean);
       } catch (error: any) {
-        if (error?.response?.status === 401 || error?.response?.status === 403) {
-          logout();
-          showToast("Please login to continue", "error");
-          navigate("/");
-          return;
-        }
         showToast(error?.response?.data?.message || "Something went wrong. Please try again");
       } finally {
         setLoading(false);
@@ -65,7 +59,7 @@ const Monitor = () => {
   const fetchReportData = async () => {
     try {
       const data = await getMonitorById(
-        access_token as string,
+        axiosInstance,
         id as string,
         "1",
         reportStartDate,
@@ -73,12 +67,6 @@ const Monitor = () => {
       );
       setReportData(data?.Report)
     } catch (error: any) {
-      if (error?.response?.status === 401 || error?.response?.status === 403) {
-        logout();
-        showToast("Please login to continue", "error");
-        navigate("/");
-        return;
-      }
       showToast(error?.response?.data?.message || "Something went wrong. Please try again");
     }
   };
@@ -104,22 +92,23 @@ const Monitor = () => {
   const handlePauseMonitor = async () => {
     try {
       const is_active = !isMonitorActive;
-      await updateMonitorById(access_token as string, id as string, {
+      await updateMonitorById(axiosInstance, id as string, {
         is_active
       });
 
-      showToast(isMonitorActive ? `Monitor has been paused successfully, Now the ${monitorData?.type?.toLowerCase()} won't get monitored until you unpause it.` : `Monitor has been successfully unpaused, Now the ${monitorData?.type?.toLowerCase()} will be monitored.`, isMonitorActive ? 'warning' : 'success', {
-        duration : 4000
+      showToast(isMonitorActive ? `Monitor has been paused successfully, Now the ${monitorData?.name} ${monitorData?.type?.toLowerCase()} won't get monitored until you unpause it.` : `Monitor has been successfully unpaused, Now the ${monitorData?.name} ${monitorData?.type?.toLowerCase()} will be monitored.`, isMonitorActive ? 'warning' : 'success', {
+        duration: 4000
       })
       setIsMonitorActive(!isMonitorActive);
     } catch (error: any) {
-      if (error?.response?.status === 401 || error?.response?.status === 403) {
-        logout();
-        showToast("Please login to continue", "error");
-        navigate("/");
-        return;
-      }
       showToast(error?.response?.data?.message || "Something went wrong. Please try again");
+    }
+  }
+
+  const handleDeleteMonitor = async () => {
+    try {
+    } catch (error) {
+      alert(error);
     }
   }
 
@@ -132,7 +121,7 @@ const Monitor = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-semibold">Monitor : {monitorData?.name}</h1>
             <p className={`text-sm ${isMonitorActive ? "text-green-400" : "text-red-400"}`}>
-              {isMonitorActive ? "Active" : "Paused"}
+              {isMonitorActive ? "✅ Active" : "🚫 Paused"}
             </p>
             <Menu as="div" className="relative inline-block text-left">
               <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -147,7 +136,7 @@ const Monitor = () => {
                           } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                         onClick={handlePauseMonitor}
                       >
-                        {isMonitorActive ? "Pause Monitor" : "Unpause Monitor"}
+                        {isMonitorActive ? "⏸️ Pause Monitor" : "▶️ Unpause Monitor"}
                       </button>
                     )}
                   </Menu.Item>
@@ -157,7 +146,7 @@ const Monitor = () => {
                         className={`${active ? "bg-blue-500 text-white" : "text-gray-200"
                           } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                       >
-                        Update Monitor
+                        🛠️ Update Monitor
                       </button>
                     )}
                   </Menu.Item>
@@ -166,8 +155,9 @@ const Monitor = () => {
                       <button
                         className={`${active ? "bg-red-500 text-white" : "text-gray-200"
                           } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                        onClick={handleDeleteMonitor}
                       >
-                        Delete Monitor
+                        ⚠️ Delete Monitor
                       </button>
                     )}
                   </Menu.Item>
@@ -234,7 +224,6 @@ const Monitor = () => {
                   color: "white", // Icon color
                 },
               }}
-
             />
           </div>
           <button

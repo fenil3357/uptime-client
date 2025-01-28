@@ -7,12 +7,14 @@ import { UserMonitorsType } from "../types/utils.types";
 import Loader from "../components/Loader";
 import LineChartComponent from "../components/Chart";
 import { useUserContext } from "../contexts/user.context";
+import useApi from "../hooks/useApi";
 
 const Dashboard = () => {
   const showToast = useToast();
   const [monitors, setMonitors] = useState<UserMonitorsType>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const { isLoggedIn, access_token, logout } = useUserContext();
+  const { isLoggedIn } = useUserContext();
+  const axiosInstance = useApi();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,16 +26,9 @@ const Dashboard = () => {
 
     const getAllMonitors = async () => {
       try {
-        const monitors: UserMonitorsType = await getUserMonitors(access_token as string);
+        const monitors: UserMonitorsType = await getUserMonitors(axiosInstance);
         setMonitors(monitors);
       } catch (error: any) {
-        // Invalid token error
-        if (error?.response?.status == 401 || error?.response?.status == 403) {
-          logout();
-          showToast('Please login to continue', 'error');
-          navigate('/');
-          return;
-        }
         showToast(error?.response?.data?.message || "Something went wrong. Please try again");
       } finally {
         setLoading(false);
@@ -43,7 +38,6 @@ const Dashboard = () => {
   }, [isLoggedIn]);
 
   const handleCreateMonitor = () => {
-    console.log("Create New Monitor button clicked");
   };
 
   const handleOpenMonitor = (id: string) => {

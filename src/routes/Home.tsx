@@ -6,11 +6,13 @@ import { getGoogleAuthUrl } from '../api/auth.api';
 import useToast from '../hooks/useToast';
 import Button from '../components/Button';
 import { useUserContext } from '../contexts/user.context';
+import useApi from '../hooks/useApi';
 
 const Home = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const showToast = useToast();
   const navigate = useNavigate();
+  const axiosInstance = useApi()
   const { isLoggedIn } = useUserContext();
 
   const handleGetStartedClick = async (): Promise<void> => {
@@ -23,7 +25,7 @@ const Home = () => {
       }
 
       // Or else proceed with authentication
-      const url: string = await getGoogleAuthUrl();
+      const url: string = await getGoogleAuthUrl(axiosInstance);
       window.location.href = url
     } catch (error: any) {
       showToast(error?.response?.data?.message || 'something went wrong. please try again.', 'error')
