@@ -8,6 +8,7 @@ import Loader from "../components/Loader";
 import LineChartComponent from "../components/Chart";
 import { useUserContext } from "../contexts/user.context";
 import useApi from "../hooks/useApi";
+// import axiosInstance from "../api/axios/axios.instance";
 
 const Dashboard = () => {
   const showToast = useToast();
@@ -19,7 +20,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      showToast('Please login to continue', 'error');
       navigate('/');
       return;
     }

@@ -21,3 +21,7 @@ export const updateMonitorById = async (axios: AxiosInstance, id: string, data: 
   const res = await axios.patch(`/monitors/${id}`, data);
   return res.data?.data;
 }
+
+export const deleteMonitorById = async (axios: AxiosInstance, id: string): Promise<void> => {
+  await axios.delete(`/monitors/${id}`);
+}

@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import { Menu } from "@headlessui/react";
 
 import useToast from "../hooks/useToast";
-import { getMonitorById, updateMonitorById } from "../api/monitor.api";
+import { deleteMonitorById, getMonitorById, updateMonitorById } from "../api/monitor.api";
 import LineChartComponent from "../components/Chart";
 import { MonitorDataType } from "../types/utils.types";
 import { ReportType } from "../types/report.types";
@@ -107,6 +107,9 @@ const Monitor = () => {
 
   const handleDeleteMonitor = async () => {
     try {
+      await deleteMonitorById(axiosInstance, id as string);
+      showToast('Monitor has been deleted successfully!');
+      navigate('/dashboard')
     } catch (error) {
       alert(error);
     }
