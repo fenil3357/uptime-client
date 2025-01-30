@@ -11,6 +11,7 @@ import { MonitorDataType } from "../types/utils.types";
 import { ReportType } from "../types/report.types";
 import { formatCustomDate } from "../helper/customData";
 import useApi from "../hooks/useApi";
+import Button from "../components/Button";
 
 const Monitor = () => {
   const [searchParams] = useSearchParams();
@@ -20,6 +21,7 @@ const Monitor = () => {
   );
   const [monitorData, setMonitorData] = useState<MonitorDataType>();
   const [isLoading, setLoading] = useState<boolean>(true);
+  const [isReportLoading, setIsReportLoading] = useState<boolean>(true);
   const [id] = useState<string | null>(searchParams.get("id"));
   const [reportData, setReportData] = useState<ReportType[]>([]);
   const [isMonitorActive, setIsMonitorActive] = useState<boolean>(true);
@@ -51,12 +53,14 @@ const Monitor = () => {
         showToast(error?.response?.data?.message || "Something went wrong. Please try again");
       } finally {
         setLoading(false);
+        setIsReportLoading(false);
       }
     };
     getMonitorData();
   }, []);
 
   const fetchReportData = async () => {
+    setIsReportLoading(true);
     try {
       const data = await getMonitorById(
         axiosInstance,
@@ -68,6 +72,9 @@ const Monitor = () => {
       setReportData(data?.Report)
     } catch (error: any) {
       showToast(error?.response?.data?.message || "Something went wrong. Please try again");
+    }
+    finally {
+      setIsReportLoading(false);
     }
   };
 
@@ -209,7 +216,6 @@ const Monitor = () => {
                   color: "white", // Icon color
                 },
               }}
-
             />
             <DateTimePicker
               label="End Date"
@@ -229,13 +235,15 @@ const Monitor = () => {
               }}
             />
           </div>
-          <button
-            onClick={fetchReportData}
-            className="w-full mt-6 px-4 py-2 text-lg font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Fetch Report Data
-          </button>
-          <div className="mt-8">
+          <div className="flex items-center justify-center mt-4">
+            <Button
+              onClick={fetchReportData}
+              label="Fetch report data"
+              isLoading={isReportLoading}
+            >
+            </Button>
+          </div>
+          <div className="mt-6">
             <h2 className="text-2xl font-bold mb-4">Error Reports</h2>
             <ul className="bg-gray-700 p-4 rounded-lg divide-y divide-gray-600">
               {reportData?.filter((report: ReportType) => report.status !== "SUCCESS").map(
