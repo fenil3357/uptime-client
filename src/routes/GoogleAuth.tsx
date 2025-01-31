@@ -34,6 +34,7 @@ const GoogleAuthCallback = () => {
         login(data.user, data.tokens.access_token);
         showToast('Google authentication successful!', 'success');
         navigate('/dashboard');
+        window.location.reload();
       } catch (error: any) {
         showToast(error?.response?.data?.message || 'Something went wrong while google authentication. Please try again.', 'error');
         navigate('/');

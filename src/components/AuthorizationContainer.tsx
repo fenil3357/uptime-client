@@ -1,24 +1,10 @@
 import { FC, ReactNode } from "react";
-
-import { useUserContext } from "../contexts/user.context";
-import useToast from "../hooks/useToast";
-import { useNavigate } from "react-router-dom";
 import { ApiProvider } from "../contexts/api.context";
-import useApi from "../hooks/useApi";
 
-const AuthorizationContainer: FC<{ children: ReactNode }> = ({ children }) => {
-  const { logout } = useUserContext()
-  const showToast = useToast();
-  const navigate = useNavigate();
-  useApi()
-
-  return <ApiProvider
-    logout={logout}
-    showToast={showToast}
-    navigate={navigate}
-  >
+const UnauthorizedContainer: FC<{ children: ReactNode }> = ({ children }) => {
+  return <ApiProvider>
     {children}
   </ApiProvider>;
 }
 
-export default AuthorizationContainer;
+export default UnauthorizedContainer;
