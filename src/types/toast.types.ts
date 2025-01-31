@@ -1,6 +1,6 @@
 import { Renderable, ToastOptions } from "react-hot-toast"
 
-export type ToastType = 'default' | 'loading' | 'success' | 'error' | 'info' | 'promise' | 'custom'
+export type ToastType = 'default' | 'loading' | 'success' | 'error' | 'info' | 'promise' | 'custom' | 'warning'
 
 export type ToastMessageType = string | Renderable | ((t: any) => Renderable)
 
