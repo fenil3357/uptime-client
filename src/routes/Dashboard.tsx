@@ -14,7 +14,7 @@ const Dashboard = () => {
   const showToast = useToast();
   const [monitors, setMonitors] = useState<UserMonitorsType>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const { isLoggedIn } = useUserContext();
+  const { isLoggedIn, user } = useUserContext();
   const axiosInstance = useApi();
   const navigate = useNavigate();
 
@@ -38,6 +38,13 @@ const Dashboard = () => {
   }, [isLoggedIn]);
 
   const handleCreateMonitor = () => {
+    try {
+      // If user does not have enough monitor quota left
+      if ((user?.monitors !== undefined) && (user?.monitors <= 0)) showToast(`You don't have enough monitor quota left. Please contact us by going to contact-us page if you want more credits.`, 'warning', { duration: 4000 })
+      else navigate('/monitor/create')
+    } catch (error) {
+      showToast('Something went wrong! Please try again.', 'error')
+    }
   };
 
   const handleOpenMonitor = (id: string) => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button as HeadlessButton } from '@headlessui/react';
-import { classNames } from '../utils/classNames';
+
+import classNames from '../utils/classNames';
 
 type ButtonProps = {
   label: string;

@@ -1,14 +1,23 @@
 import { useState } from 'react';
-
-const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'Features', href: '/features' },
-  { name: 'Pricing', href: '/pricing' },
-  { name: 'About', href: '/about' },
-];
+import { useUserContext } from '../contexts/user.context';
+import useToast from '../hooks/useToast';
+import { useNavigate } from 'react-router-dom';
+import { getGoogleAuthUrl } from '../api/auth.api';
+import useApi from '../hooks/useApi';
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isLoggedIn, logout } = useUserContext();
+  const showToast = useToast();
+  const navigate = useNavigate();
+  const axiosInstance = useApi();
+
+  const [navigation] = useState([
+    { name: 'Home', href: '/' },
+    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'About Us', href: '/about' },
+    { name: isLoggedIn ? 'Logout' : 'Login', href: '/' },
+  ]);
 
   return (
     <header className="bg-gray-900 text-white">
@@ -21,13 +30,29 @@ export const Navbar = () => {
           </div>
           <div className="hidden md:flex space-x-8">
             {navigation.map((item) => (
-              <a
+              <button
                 key={item.name}
-                href={item.href}
                 className="text-lg font-medium hover:text-blue-400"
+                onClick={async () => {
+                  if (item.name === 'Logout') {
+                    logout();
+                    showToast('Logged out successfully!', 'success');
+                    navigate('/');
+                    window.location.reload();
+                    return;
+                  }
+
+                  if (item.name == 'Login') {
+                    const url: string = await getGoogleAuthUrl(axiosInstance);
+                    window.location.href = url;
+                    return;
+                  }
+
+                  navigate(item?.href || '/');
+                }}
               >
                 {item.name}
-              </a>
+              </button>
             ))}
           </div>
           <button
@@ -49,13 +74,29 @@ export const Navbar = () => {
         <div className="md:hidden bg-gray-800">
           <nav className="space-y-2 px-4 py-3">
             {navigation.map((item) => (
-              <a
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={async () => {
+                  if (item.name === 'Logout') {
+                    logout();
+                    showToast('Logged out successfully!', 'success');
+                    navigate('/');
+                    window.location.reload()
+                    return;
+                  }
+
+                  if (item.name == 'Login') {
+                    const url: string = await getGoogleAuthUrl(axiosInstance);
+                    window.location.href = url;
+                    return;
+                  }
+
+                  navigate(item.href || '/');
+                }}
                 className="block text-lg font-medium text-gray-300 hover:text-blue-400"
               >
                 {item.name}
-              </a>
+              </button>
             ))}
           </nav>
         </div>

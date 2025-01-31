@@ -240,8 +240,7 @@ const Monitor = () => {
               onClick={fetchReportData}
               label="Fetch report data"
               isLoading={isReportLoading}
-            >
-            </Button>
+            />
           </div>
           <div className="mt-6">
             <h2 className="text-2xl font-bold mb-4">Error Reports</h2>

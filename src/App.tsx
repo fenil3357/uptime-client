@@ -10,6 +10,7 @@ import NotFound from './components/NotFound';
 import Dashboard from './routes/Dashboard';
 import { UserProvider } from './contexts/user.context';
 import AuthorizationContainer from './components/AuthorizationContainer';
+import CreateMonitor from './routes/CreateMonitor';
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
                 <Route path="/auth/google" element={<GoogleAuthCallback />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path='/monitor' element={<Monitor />} />
+                <Route path='/monitor/create' element={<CreateMonitor />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
