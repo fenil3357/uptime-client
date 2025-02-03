@@ -1,8 +1,0 @@
-static_sites:
-  - name: uptime-pro
-    buildCommand: npm run build
-    staticSitePath: dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
