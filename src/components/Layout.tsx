@@ -2,17 +2,17 @@ import { Toaster } from 'react-hot-toast';
 import { Navbar } from './Navbar';
 import { Outlet } from 'react-router-dom';
 
-export default function Layout() {
+const Layout = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-950 text-white flex flex-col">
       {/* Persistent Navbar */}
       <Navbar />
-      
+
       {/* Dynamic Content for Each Route */}
       <main className="flex-1 px-4 py-6">
         <Outlet />
       </main>
-      
+
       {/* Toast Notifications */}
       <Toaster
         position="top-center"
@@ -36,3 +36,5 @@ export default function Layout() {
     </div>
   );
 }
+
+export default Layout;

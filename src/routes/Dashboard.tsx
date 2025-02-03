@@ -1,19 +1,32 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import useToast from "../hooks/useToast";
 import { getUserMonitors } from "../api/monitor.api";
 import { UserMonitorsType } from "../types/utils.types";
 import Loader from "../components/Loader";
 import LineChartComponent from "../components/Chart";
+import { useUserContext } from "../contexts/user.context";
+import useApi from "../hooks/useApi";
+// import axiosInstance from "../api/axios/axios.instance";
 
 const Dashboard = () => {
   const showToast = useToast();
   const [monitors, setMonitors] = useState<UserMonitorsType>([]);
   const [isLoading, setLoading] = useState<boolean>(true);
+  const { isLoggedIn, user } = useUserContext();
+  const axiosInstance = useApi();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/');
+      return;
+    }
+
     const getAllMonitors = async () => {
       try {
-        const monitors: UserMonitorsType = await getUserMonitors();
+        const monitors: UserMonitorsType = await getUserMonitors(axiosInstance);
         setMonitors(monitors);
       } catch (error: any) {
         showToast(error?.response?.data?.message || "Something went wrong. Please try again");
@@ -21,13 +34,22 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
-
     getAllMonitors();
-  }, []);
+  }, [isLoggedIn]);
 
   const handleCreateMonitor = () => {
-    console.log("Create New Monitor button clicked");
+    try {
+      // If user does not have enough monitor quota left
+      if ((user?.monitors !== undefined) && (user?.monitors <= 0)) showToast(`You don't have enough monitor quota left. Please contact us by going to contact-us page if you want more credits.`, 'warning', { duration: 4000 })
+      else navigate('/monitor/create')
+    } catch (error) {
+      showToast('Something went wrong! Please try again.', 'error')
+    }
   };
+
+  const handleOpenMonitor = (id: string) => {
+    navigate(`/monitor?id=${id}`)
+  }
 
   return (
     <div className="min-h-screen py-8">
@@ -65,14 +87,13 @@ const Dashboard = () => {
               />
 
               {/* Button to redirect to monitor page */}
-              <a
-                href={`/monitor/${monitor.id}`}
-                target="_blank"
+              <button
                 rel="noopener noreferrer"
                 className="mt-auto bg-green-500 text-white py-3 rounded-lg text-center hover:bg-green-600 transition"
+                onClick={() => handleOpenMonitor(monitor.id as string)}
               >
                 OPEN
-              </a>
+              </button>
             </div>
           ))}
         </div>
