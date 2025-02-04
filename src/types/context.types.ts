@@ -5,5 +5,6 @@ export type UserContextType = {
   access_token: string | null,
   login: (user: user, token: string) => void;
   logout: () => void;
-  isLoggedIn: boolean
+  isLoggedIn: boolean,
+  setUser: (user: user) => void
 }

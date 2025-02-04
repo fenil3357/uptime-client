@@ -7,7 +7,7 @@ import useApi from '../hooks/useApi';
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isLoggedIn, logout } = useUserContext();
+  const { isLoggedIn, logout, user } = useUserContext();
   const showToast = useToast();
   const navigate = useNavigate();
   const axiosInstance = useApi();
@@ -54,6 +54,16 @@ export const Navbar = () => {
                 {item.name}
               </button>
             ))}
+            {isLoggedIn &&
+              <div className='relative group hover:cursor-pointer'>
+                <img src={user?.avatar} className='w-12 h-12 rounded-full object-cover'></img>
+
+                {/* Hover Text */}
+                <div className="absolute mt-20 inset-0 flex items-center justify-center bg-black text-white text-md font-semibold opacity-0 group-hover:opacity-90 transition-opacity duration-300">
+                  {user?.name}
+                </div>
+              </div>
+            }
           </div>
           <button
             type="button"
