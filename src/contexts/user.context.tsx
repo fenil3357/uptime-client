@@ -1,7 +1,7 @@
 import { createContext, FC, ReactNode, useContext, useState } from "react";
 
 import { UserContextType } from "../types/context.types";
-import { user as UserType } from "../types/user.types";
+import { user, user as UserType } from "../types/user.types";
 import { STORAGE_CONSTANTS } from "../constants/storage.constants";
 
 const UserContext = createContext<UserContextType | undefined>({
@@ -9,11 +9,12 @@ const UserContext = createContext<UserContextType | undefined>({
   access_token: null,
   login: () => { },
   logout: () => { },
-  isLoggedIn: false
+  isLoggedIn: false,
+  setUser: () => { }
 })
 
 export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserType | null>(() => {
+  const [user, setUserData] = useState<UserType | null>(() => {
     try {
       const storedUser = localStorage.getItem(STORAGE_CONSTANTS.user);
       return storedUser ? JSON.parse(storedUser) : null;
@@ -31,7 +32,7 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
   })
 
   const login = (user: UserType, access_token: string) => {
-    setUser(user);
+    setUserData(user);
     setAccessToken(access_token);
     localStorage.setItem(STORAGE_CONSTANTS.user, JSON.stringify(user));
     localStorage.setItem(STORAGE_CONSTANTS.access_token, access_token);
@@ -39,19 +40,24 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
+    setUserData(null);
     setAccessToken(null);
     localStorage.removeItem(STORAGE_CONSTANTS.user);
     localStorage.removeItem(STORAGE_CONSTANTS.access_token);
     setIsLoggedIn(false)
   };
 
+  const setUser = async (user: user) => {
+    setUserData(user);
+  }
+
   return <UserContext.Provider value={{
     user,
     access_token,
     login,
     logout,
-    isLoggedIn
+    isLoggedIn,
+    setUser
   }}>{children}</UserContext.Provider>
 }
 
