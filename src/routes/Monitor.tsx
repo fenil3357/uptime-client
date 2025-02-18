@@ -129,7 +129,12 @@ const Monitor = () => {
       ) : (
         <div className="w-full max-w-4xl p-6 bg-gray-800 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-semibold">Monitor : {monitorData?.name}</h1>
+            <div>
+              <h1 className="text-2xl font-semibold">{monitorData?.name}</h1>
+              <h1 className="text-xl font-semibold mt-2 underline">
+                <a href={monitorData?.endpoint} target="_blank">{monitorData?.endpoint}</a>
+              </h1>
+            </div>
             <p className={`text-sm ${isMonitorActive ? "text-green-400" : "text-red-400"}`}>
               {isMonitorActive ? "✅ Active" : "🚫 Paused"}
             </p>
