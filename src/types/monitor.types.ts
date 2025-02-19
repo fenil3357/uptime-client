@@ -12,7 +12,8 @@ export type MonitorType = {
   updatedAt: Date
 }
 
-export type MonitorFormType = Omit<MonitorType, 'id' | 'user_id' | 'is_active' | 'headers' | 'payload' | 'createdAt' | 'updatedAt'> & {
-  headers?: string,
-  payload?: string
-}
+export type MonitorFormType = Partial<Omit<MonitorType, 'id' | 'user_id' | 'headers' | 'payload' | 'createdAt' | 'updatedAt'> & {
+  headers?: string | null,
+  payload?: string | null,
+  is_active?: boolean
+}>
