@@ -7,8 +7,8 @@ export const getUserMonitors = async (axios: AxiosInstance): Promise<UserMonitor
   return res.data?.data;
 }
 
-export const getMonitorById = async (axios: AxiosInstance, id: string, reportOnly: '0' | '1', reportStartDate?: Date, reportEndDate?: Date): Promise<MonitorDataType> => {
-  const params = new URLSearchParams({ id, reportOnly });
+export const getMonitorById = async (axios: AxiosInstance, id: string, reportOnly: '0' | '1', monitorOnly: '0' | '1', reportStartDate?: Date, reportEndDate?: Date): Promise<MonitorDataType> => {
+  const params = new URLSearchParams({ id, reportOnly, monitorOnly });
 
   if (reportStartDate) params.append("reportStartDate", reportStartDate.toISOString());
   if (reportEndDate) params.append("reportEndDate", reportEndDate.toISOString());
@@ -17,7 +17,7 @@ export const getMonitorById = async (axios: AxiosInstance, id: string, reportOnl
   return res?.data?.data;
 }
 
-export const updateMonitorById = async (axios: AxiosInstance, id: string, data: Partial<Omit<MonitorType, 'id' | 'user_id' | 'createdAt' | 'updatedAt'>>): Promise<MonitorType> => {
+export const updateMonitorById = async (axios: AxiosInstance, id: string, data: MonitorFormType): Promise<MonitorType> => {
   const res = await axios.patch(`/monitors/${id}`, data);
   return res?.data?.data;
 }

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ApiProvider } from "../contexts/api.context";
@@ -14,6 +14,10 @@ const UnauthorizedContainer: FC<{ children: ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/');
+      return;
+    }
     const fetchUserData = async () => {
       try {
         const user = await getOneUser(axiosInstance);
@@ -23,7 +27,7 @@ const UnauthorizedContainer: FC<{ children: ReactNode }> = ({ children }) => {
         navigate('/');
       }
     }
-    if (isLoggedIn) fetchUserData();
+    fetchUserData();
   }, []);
 
   return <ApiProvider>

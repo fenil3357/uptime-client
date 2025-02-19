@@ -8,7 +8,6 @@ import Loader from "../components/Loader";
 import LineChartComponent from "../components/Chart";
 import { useUserContext } from "../contexts/user.context";
 import useApi from "../hooks/useApi";
-// import axiosInstance from "../api/axios/axios.instance";
 
 const Dashboard = () => {
   const showToast = useToast();
@@ -19,17 +18,18 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if(!isLoggedIn) {
       navigate('/');
       return;
     }
+    document.title = `Dashboard`
 
     const getAllMonitors = async () => {
       try {
         const monitors: UserMonitorsType = await getUserMonitors(axiosInstance);
         setMonitors(monitors);
       } catch (error: any) {
-        showToast(error?.response?.data?.message || "Something went wrong. Please try again");
+        showToast(error?.response?.data?.message || "Something went wrong. Please try again", 'error');
       } finally {
         setLoading(false);
       }

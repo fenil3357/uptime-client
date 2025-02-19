@@ -1,34 +1,37 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Listbox } from "@headlessui/react";
 
 import { useUserContext } from "../contexts/user.context";
-import { useNavigate } from "react-router-dom";
-import useToast from "../hooks/useToast";
-import isValidUrl from "../utils/isValidUrl";
 import { MonitorFormType } from "../types/monitor.types";
+import isValidUrl from "../utils/isValidUrl";
 import isValidJsonObject from "../utils/isValidJSON";
-import Button from "../components/Button";
+import useToast from "../hooks/useToast";
 import useApi from "../hooks/useApi";
-import { createMonitor } from "../api/monitor.api";
+import Button from "../components/Button";
+import { getMonitorById, updateMonitorById } from "../api/monitor.api";
 
 const methods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 const types = ["WEBSITE", "API"];
 
-const CreateMonitor = () => {
-  const { isLoggedIn, user } = useUserContext();
+const UpdateMonitor = () => {
+  const [searchParams] = useSearchParams();
+  const { isLoggedIn } = useUserContext();
+  const navigate = useNavigate();
+  const showToast = useToast();
+  const axiosInstance = useApi();
+
+  const [id] = useState<string | null>(searchParams.get("id"));
   const [form, setForm] = useState<MonitorFormType>({
     name: `Monitor ${crypto.randomUUID().split('-')[0]}`,
     type: "WEBSITE",
     endpoint: "",
     method: "GET",
     payload: undefined,
-    headers: undefined,
+    headers: undefined
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const navigate = useNavigate();
-  const showToast = useToast();
-  const axiosInstance = useApi();
+  const [isMonitorDataLoading, setIsMonitorDataLoading] = useState<boolean>(true);
 
   const [payloadInput, setPayloadInput] = useState<string>("");
   const [headersInput, setHeadersInput] = useState<string>("");
@@ -59,7 +62,7 @@ const CreateMonitor = () => {
       }
 
       // Payload validation
-      if (!payloadInput.trim()) form.payload = undefined; // No input for payload
+      if (!payloadInput.trim()) form.payload = null; // No input for payload
       else {
         // Invalid json input for payload
         if (!isValidJsonObject(payloadInput)) {
@@ -67,12 +70,12 @@ const CreateMonitor = () => {
           return;
         }
         const parsed = JSON.parse(payloadInput);
-        if (Object.keys(parsed)?.length > 0) form.payload = payloadInput;
-        else form.payload = undefined;
+        if (Object.keys(parsed)?.length > 0) form.payload = parsed;
+        else form.payload = null;
       }
 
       // Headers validation
-      if (!headersInput.trim()) form.headers = undefined; // No input for headers
+      if (!headersInput.trim()) form.headers = null; // No input for headers
       else {
         // Invalid json input for headers
         if (!isValidJsonObject(headersInput)) {
@@ -80,13 +83,13 @@ const CreateMonitor = () => {
           return;
         }
         const parsed = JSON.parse(headersInput);
-        if (Object.keys(parsed)?.length > 0) form.headers = headersInput;
-        else form.headers = undefined
+        if (Object.keys(parsed)?.length > 0) form.headers = parsed;
+        else form.headers = null;
       }
 
-      const monitorData = await createMonitor(axiosInstance, form);
-      showToast('Your monitor has been created successfully and now it will be monitored!', 'success', { duration: 3500 });
-      navigate(`/monitor?id=${monitorData?.id}`)
+      await updateMonitorById(axiosInstance, id as string, form)
+      showToast('Monitor data has been updated!', 'success')
+      navigate(`/monitor?id=${id}`)
     } catch (error: any) {
       showToast(error?.response?.data?.message || 'Something went wrong while creating monitor, Please try again', 'error');
     }
@@ -96,22 +99,38 @@ const CreateMonitor = () => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !id || id == "") {
       navigate('/');
       return;
     }
-    // If user does not have enough monitor quota left
-    if ((user?.monitors !== undefined) && (user?.monitors <= 0)) {
-      navigate('/dashboard');
-      return;
+    
+    const fetchMonitorData = async (id: string) => {
+      try {
+        const monitorData = await getMonitorById(axiosInstance, id, "0", "1");
+        setForm({
+          name: monitorData?.name as string,
+          endpoint: monitorData?.endpoint as string,
+          method: monitorData?.method as any,
+          type: monitorData?.type as any,
+          payload: monitorData?.payload ? JSON.stringify(monitorData?.payload, null, 2) : undefined,
+          headers: monitorData?.headers ? JSON.stringify(monitorData?.headers, null, 2) : undefined
+        })
+        if (monitorData?.payload) setPayloadInput(JSON.stringify(monitorData?.payload, null, 2));
+        if (monitorData?.headers) setHeadersInput(JSON.stringify(monitorData?.headers, null, 2));
+        document.title = `Update ${monitorData.name} monitor`
+        setIsMonitorDataLoading(false);
+      } catch (error) {
+        navigate('/');
+        return;
+      }
     }
-    document.title = 'Create new monitor'
-  }, [])
 
+    fetchMonitorData(id);
+  }, []);
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4">
+    !isMonitorDataLoading && <div className="flex flex-col items-center justify-center min-h-screen px-4">
       <div className="max-w-lg w-full bg-gray-900 p-6 rounded-2xl shadow-xl border border-gray-700">
-        <h1 className="text-white text-2xl font-bold mb-4">Create Monitor</h1>
+        <h1 className="text-white text-2xl font-bold mb-4">Update Monitor : {form.name}</h1>
 
         <label className="block text-gray-400">Name</label>
         <input type="text" name="name" value={form.name} onChange={handleChange} className="w-full bg-gray-800 text-white p-2 rounded-lg border border-gray-700 focus:ring-2 focus:ring-blue-500" placeholder="Enter monitor name" />
@@ -166,10 +185,9 @@ const CreateMonitor = () => {
         />
 
         <div className="flex gap-4 mt-6">
-          {/* <button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg">Create Monitor</button> */}
           <Button
             onClick={handleSubmit}
-            label="Create monitor"
+            label="Update monitor"
             isLoading={isLoading}
           />
           <button onClick={() => (window.location.href = "/dashboard")} className="bg-gray-600 hover:bg-gray-500 text-white py-2 px-4 rounded-lg">Go to Dashboard</button>
@@ -179,4 +197,4 @@ const CreateMonitor = () => {
   );
 }
 
-export default CreateMonitor;
+export default UpdateMonitor;

@@ -12,6 +12,7 @@ import { ReportType } from "../types/report.types";
 import { formatCustomDate } from "../helper/customData";
 import useApi from "../hooks/useApi";
 import Button from "../components/Button";
+import { useUserContext } from "../contexts/user.context";
 
 const Monitor = () => {
   const [searchParams] = useSearchParams();
@@ -29,12 +30,16 @@ const Monitor = () => {
   const navigate = useNavigate();
   const showToast = useToast();
   const axiosInstance = useApi();
+  const { isLoggedIn } = useUserContext();
 
   useEffect(() => {
     const getMonitorData = async () => {
       try {
+        if (!isLoggedIn) {
+          navigate('/');
+          return;
+        }
         if (!id) {
-          showToast("Invalid monitor id", "error");
           navigate("/dashboard");
           return;
         }
@@ -43,12 +48,14 @@ const Monitor = () => {
           axiosInstance,
           id,
           "0",
+          "0",
           reportStartDate,
           reportEndDate
         );
         setMonitorData(data);
         setReportData(data?.Report);
         setIsMonitorActive(data?.is_active as boolean);
+        document.title = `${data?.name} monitor`
       } catch (error: any) {
         showToast(error?.response?.data?.message || "Something went wrong. Please try again");
       } finally {
@@ -66,6 +73,7 @@ const Monitor = () => {
         axiosInstance,
         id as string,
         "1",
+        "0",
         reportStartDate,
         reportEndDate
       );
@@ -117,8 +125,16 @@ const Monitor = () => {
       await deleteMonitorById(axiosInstance, id as string);
       showToast('Monitor has been deleted successfully!');
       navigate('/dashboard')
+    } catch (error: any) {
+      showToast(error?.response?.data?.message || "Something went wrong. Please try again");
+    }
+  }
+
+  const handleUpdateMonitor = (id: string) => {
+    try {
+      navigate(`/monitor/update?id=${id}`)
     } catch (error) {
-      alert(error);
+      showToast('Something went wrong. Please try again')
     }
   }
 
@@ -129,7 +145,12 @@ const Monitor = () => {
       ) : (
         <div className="w-full max-w-4xl p-6 bg-gray-800 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-semibold">Monitor : {monitorData?.name}</h1>
+            <div>
+              <h1 className="text-2xl font-semibold">{monitorData?.name}</h1>
+              <h1 className="text-xl font-semibold mt-2 underline">
+                <a href={monitorData?.endpoint} target="_blank">{monitorData?.endpoint}</a>
+              </h1>
+            </div>
             <p className={`text-sm ${isMonitorActive ? "text-green-400" : "text-red-400"}`}>
               {isMonitorActive ? "✅ Active" : "🚫 Paused"}
             </p>
@@ -155,6 +176,7 @@ const Monitor = () => {
                       <button
                         className={`${active ? "bg-blue-500 text-white" : "text-gray-200"
                           } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                        onClick={() => handleUpdateMonitor(monitorData?.id as string)}
                       >
                         🛠️ Update Monitor
                       </button>
