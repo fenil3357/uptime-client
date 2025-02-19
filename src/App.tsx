@@ -11,6 +11,7 @@ import Dashboard from './routes/Dashboard';
 import { UserProvider } from './contexts/user.context';
 import AuthorizationContainer from './components/AuthorizationContainer';
 import CreateMonitor from './routes/CreateMonitor';
+import UpdateMonitor from './routes/UpdateMonitor';
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path='/monitor' element={<Monitor />} />
                 <Route path='/monitor/create' element={<CreateMonitor />} />
+                <Route path='/monitor/update' element={<UpdateMonitor />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>

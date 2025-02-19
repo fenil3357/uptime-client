@@ -1,5 +1,5 @@
 import Typewriter from 'typewriter-effect'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { getGoogleAuthUrl } from '../api/auth.api';
@@ -15,20 +15,22 @@ const Home = () => {
   const axiosInstance = useApi()
   const { isLoggedIn } = useUserContext();
 
+  useEffect(() => {
+    document.title = 'UPTIME | Home'
+  }, []);
+
   const handleGetStartedClick = async (): Promise<void> => {
     setLoading(true);
     try {
-      // If user is already logged in then redirect to dashboard
       if (isLoggedIn) {
         navigate('/dashboard');
         return;
       }
 
-      // Or else proceed with authentication
       const url: string = await getGoogleAuthUrl(axiosInstance);
       window.location.href = url
     } catch (error: any) {
-      showToast(error?.response?.data?.message || 'something went wrong. please try again.', 'error')
+      showToast(error?.response?.data?.message || 'Something went wrong. please try again.', 'error')
     }
     finally {
       setLoading(false)

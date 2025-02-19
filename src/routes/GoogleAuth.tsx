@@ -24,7 +24,6 @@ const GoogleAuthCallback = () => {
       const encrypted = searchParams.get('encrypted');
 
       if (!encrypted) {
-        showToast('Invalid or null encrypted value', 'error');
         navigate('/');
         return;
       }
