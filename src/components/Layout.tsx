@@ -1,19 +1,17 @@
 import { Toaster } from 'react-hot-toast';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
-import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 to-gray-950 text-white flex flex-col">
-      {/* Persistent Navbar */}
-      <Navbar />
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
-      {/* Dynamic Content for Each Route */}
-      <main className="flex-1 px-4 py-6">
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col">
+      <Navbar />
+      <main className={`flex-1 ${isHome ? '' : 'pt-20 px-4 pb-6'}`}>
         <Outlet />
       </main>
-
-      {/* Toast Notifications */}
       <Toaster
         position="top-center"
         gutter={8}
@@ -35,6 +33,6 @@ const Layout = () => {
       />
     </div>
   );
-}
+};
 
 export default Layout;
